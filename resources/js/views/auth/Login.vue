@@ -16,15 +16,18 @@
                                     <form class="user">
                                         <div class="form-group">
                                             <input type="email" class="form-control form-control-user"
-                                                   placeholder="Enter Email Address..." :disabled="disabled">
+                                                   placeholder="Enter Email Address..."
+                                                   v-model="email" :disabled="disabled">
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
-                                                   placeholder="Password" :disabled="disabled">
+                                                   placeholder="Password"
+                                                   v-model="password" :disabled="disabled">
                                         </div>
                                         <div class="form-group">
                                             <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck" :disabled="disabled">
+                                                <input type="checkbox" class="custom-control-input" id="customCheck"
+                                                       v-model="remember" :disabled="disabled">
                                                 <label class="custom-control-label" for="customCheck">Remember Me</label>
                                             </div>
                                         </div>
@@ -59,11 +62,17 @@
 </template>
 
 <script>
+    import axios from 'axios';
+    import { LOGIN } from '../../store/actions';
+
     export default {
         name: 'Login',
         data() {
             return {
-                isProcessing: false
+                isProcessing: false,
+                email: null,
+                password: null,
+                remember: false
             };
         },
         computed: {
@@ -74,6 +83,20 @@
         methods: {
             handleLogin() {
                 this.isProcessing = true;
+                axios.post('/api/login', {
+                    email: this.email,
+                    password: this.password
+                }).then(response => {
+                    if (response.data) {
+                        return this.$store.dispatch(LOGIN, {
+                            token: response.data.token,
+                            remember: this.remember
+                        }).then(() => this.$router.push({ name: 'dashboard' }))
+                            .finally(() => this.isProcessing = false);
+                    }
+                }).catch(error => {
+                    this.isProcessing = false;
+                });
             }
         }
     }

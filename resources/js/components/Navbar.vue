@@ -32,7 +32,9 @@
                         <b-icon icon="person-fill" /> User
                     </template>
                     <b-dropdown-item href="#"><b-icon icon="toggles" /> Profile</b-dropdown-item>
-                    <b-dropdown-item href="#"><b-icon icon="box-arrow-left" /> Sign Out</b-dropdown-item>
+                    <b-dropdown-item @click="handleLogout">
+                        <b-icon icon="box-arrow-left" /> Sign Out
+                    </b-dropdown-item>
                 </b-nav-item-dropdown>
             </b-navbar-nav>
         </b-collapse>
@@ -40,8 +42,15 @@
 </template>
 
 <script>
+    import { LOGOUT } from '../store/actions';
+
     export default {
-        name: 'Navbar'
+        name: 'Navbar',
+        methods: {
+            handleLogout() {
+                this.$store.dispatch(LOGOUT).then(() => this.$router.push({ name: 'login' }));
+            }
+        }
     }
 </script>
 
