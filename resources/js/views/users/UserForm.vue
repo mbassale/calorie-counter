@@ -38,9 +38,11 @@
     import _ from 'lodash';
     import {mapState, mapGetters} from 'vuex';
     import {LOAD_ROLES, UPDATE_USER} from '../../store/actions';
+    import Toasts from '../../mixins/Toasts';
 
     export default {
         name: 'UserForm',
+        mixins: [Toasts],
         props: {
             user: {
                 required: false,
@@ -100,7 +102,8 @@
                 evt.preventDefault();
                 this.isProcessing = true;
                 this.$store.dispatch(UPDATE_USER, _.pick(this, ['id', 'role_id', 'first_name', 'last_name', 'email']))
-                    .then(() => console.log('updated'))
+                    .then(() => this.showSuccess('User Updated'))
+                    .catch(error => this.showNetworkError(error))
                     .finally(() => this.isProcessing = false);
             },
             onReset(evt) {
