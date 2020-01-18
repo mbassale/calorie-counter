@@ -1,13 +1,13 @@
 <template>
     <b-navbar toggleable="lg" type="dark" variant="dark">
-        <b-navbar-brand href="#"><b-icon icon="graph-down" /> Calorie Counter</b-navbar-brand>
+        <b-navbar-brand :to="{ name: 'dashboard' }"><b-icon icon="graph-down" /> Calorie Counter</b-navbar-brand>
 
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
         <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav>
-                <b-nav-item href="#">Link</b-nav-item>
-                <b-nav-item href="#" disabled>Disabled</b-nav-item>
+                <b-nav-item :to="{ name: 'dashboard' }">Dashboard</b-nav-item>
+                <b-nav-item v-if="isAdmin || isManager" :to="{ name: 'users' }">Users</b-nav-item>
             </b-navbar-nav>
 
             <!-- Right aligned nav items -->
@@ -23,7 +23,6 @@
                     </template>
                     <b-dropdown-item href="#">English</b-dropdown-item>
                     <b-dropdown-item href="#">Español</b-dropdown-item>
-                    <b-dropdown-item href="#">Italiano</b-dropdown-item>
                 </b-nav-item-dropdown>
 
                 <b-nav-item-dropdown right>
@@ -42,10 +41,15 @@
 </template>
 
 <script>
+    import { mapState, mapGetters } from 'vuex';
     import { LOGOUT } from '../store/actions';
 
     export default {
         name: 'Navbar',
+        computed: {
+            ...mapState(['user']),
+            ...mapGetters(['isAdmin', 'isManager', 'isUser'])
+        },
         methods: {
             handleLogout() {
                 this.$store.dispatch(LOGOUT).then(() => this.$router.push({ name: 'login' }));

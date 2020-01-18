@@ -3,25 +3,45 @@ import createPersistedState from 'vuex-persistedstate';
 
 import {
     SET_TOKEN,
-    SET_USER
+    SET_USER,
+    SET_USERS
 } from './mutations';
 
 import {
     LOGIN,
-    LOGOUT
+    LOGOUT,
+    LOAD_USERS
 } from './actions';
+
+import { ROLE_ADMIN, ROLE_MANAGER, ROLE_USER } from './roles';
 
 export default {
     plugins: [
-        createPersistedState()
+        createPersistedState({
+            rehydrated: store => {
+                if (store.state.token) {
+                    window.axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
+                }
+            }
+        })
     ],
     state: {
         user: null,
-        token: null
+        token: null,
+        users: []
     },
     getters: {
         isGuest(state) {
             return !state.token;
+        },
+        isAdmin(state) {
+            return state.user ? state.user.role_id === ROLE_ADMIN : false;
+        },
+        isManager(state) {
+            return state.user ? state.user.role_id === ROLE_MANAGER : false;
+        },
+        isUser(state) {
+            return state.user ? state.user.role_id === ROLE_USER : false;
         }
     },
     mutations: {
@@ -30,6 +50,9 @@ export default {
         },
         [SET_USER](state, user) {
             state.user = user;
+        },
+        [SET_USERS](state, users) {
+            state.users = users || [];
         }
     },
     actions: {
@@ -43,6 +66,10 @@ export default {
             commit(SET_TOKEN, null);
             commit(SET_USER, null);
             return Promise.resolve();
+        },
+        async [LOAD_USERS]({ commit }) {
+            const { data } = await axios.get('/api/users');
+            commit(SET_USERS, data);
         }
     }
 };

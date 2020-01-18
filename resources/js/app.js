@@ -41,6 +41,7 @@ import Dashboard from './views/dashboard/Dashboard.vue'
 import Login from './views/auth/Login.vue';
 import Register from './views/auth/Register.vue';
 import ForgotPassword from './views/auth/ForgotPassword.vue';
+import Users from './views/users/Users.vue';
 
 const router = new VueRouter({
     mode: 'history',
@@ -64,6 +65,15 @@ const router = new VueRouter({
             path: '/forgot-password',
             name: 'forgotPassword',
             component: ForgotPassword
+        },
+        {
+            path: '/users',
+            name: 'users',
+            component: Users,
+            beforeEnter: (to, from, next) => {
+                if (store.getters.isAdmin || store.getters.isManager) next();
+                else next('/');
+            }
         }
     ],
 });
@@ -73,6 +83,11 @@ router.beforeEach((to, from, next) => {
     if (to.name !== 'login' && to.name !== 'register' && store.getters.isGuest) next('/login');
     else next();
 });
+
+/**
+ * Filters
+ */
+import './filters/capitalize';
 
 const app = new Vue({
     el: '#app',
