@@ -26,13 +26,6 @@
                                                    v-model="password" :disabled="disabled"
                                                    @keydown.enter="handleLogin">
                                         </div>
-                                        <div class="form-group">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck"
-                                                       v-model="remember" :disabled="disabled">
-                                                <label class="custom-control-label" for="customCheck">Remember Me</label>
-                                            </div>
-                                        </div>
                                         <button type="button" class="btn btn-primary btn-user btn-block"
                                                 @click="handleLogin" :disabled="disabled">
                                             Login
@@ -73,8 +66,7 @@
             return {
                 isProcessing: false,
                 email: null,
-                password: null,
-                remember: false
+                password: null
             };
         },
         computed: {
@@ -91,8 +83,7 @@
                 }).then(response => {
                     if (response.data) {
                         return this.$store.dispatch(LOGIN, {
-                            token: response.data.token,
-                            remember: this.remember
+                            token: response.data.token
                         }).then(() => this.$router.push({ name: 'dashboard' }))
                             .finally(() => this.isProcessing = false);
                     }
