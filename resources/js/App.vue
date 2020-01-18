@@ -1,8 +1,7 @@
 <template>
     <div>
-        <navbar v-if="!isGuest" />
+        <navbar class="main-navbar" v-if="!isGuest" />
         <router-view></router-view>
-
     </div>
 </template>
 
@@ -23,5 +22,7 @@
 </script>
 
 <style scoped>
-
+    .main-navbar {
+        margin-bottom: 1rem;
+    }
 </style>
