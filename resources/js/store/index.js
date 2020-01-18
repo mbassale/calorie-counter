@@ -1,4 +1,6 @@
 
+import createPersistedState from 'vuex-persistedstate';
+
 import {
     SET_TOKEN,
     SET_USER
@@ -10,6 +12,9 @@ import {
 } from './actions';
 
 export default {
+    plugins: [
+        createPersistedState()
+    ],
     state: {
         user: null,
         token: null
