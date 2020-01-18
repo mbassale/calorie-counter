@@ -97,7 +97,7 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model)
     {
-        return $user->isManager();
+        return false;
     }
 
     public function updateRole(User $user)

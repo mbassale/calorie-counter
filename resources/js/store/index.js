@@ -12,7 +12,9 @@ import {
     LOGIN,
     LOGOUT,
     LOAD_ROLES,
-    LOAD_USERS, UPDATE_USER
+    LOAD_USERS,
+    UPDATE_USER,
+    DELETE_USER
 } from './actions';
 
 import { ROLE_ADMIN, ROLE_MANAGER, ROLE_USER } from './roles';
@@ -87,6 +89,15 @@ export default {
             if (userIndex >= 0) {
                 let updatedUsers = _.cloneDeep(state.users);
                 updatedUsers.splice(userIndex, 1, user);
+                commit(SET_USERS, updatedUsers);
+            }
+        },
+        async [DELETE_USER]({ dispatch, commit, state }, payload) {
+            const { data: user } = await axios.delete('/api/users/' + payload.id);
+            let userIndex = state.users.findIndex(u => u.id === user.id);
+            if (userIndex >= 0) {
+                let updatedUsers = _.cloneDeep(state.users);
+                updatedUsers.splice(userIndex, 1);
                 commit(SET_USERS, updatedUsers);
             }
         }

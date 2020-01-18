@@ -38,11 +38,11 @@
     import _ from 'lodash';
     import {mapState, mapGetters} from 'vuex';
     import {LOAD_ROLES, UPDATE_USER} from '../../store/actions';
-    import Toasts from '../../mixins/Toasts';
+    import ToastMixin from '../../mixins/ToastMixin';
 
     export default {
         name: 'UserForm',
-        mixins: [Toasts],
+        mixins: [ToastMixin],
         props: {
             user: {
                 required: false,
