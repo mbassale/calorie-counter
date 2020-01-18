@@ -33,12 +33,11 @@ export default {
         }
     },
     actions: {
-        async [LOGIN]({ commit, state }, { token, remember }) {
+        async [LOGIN]({ commit, state }, { token }) {
             commit(SET_TOKEN, token);
             window.axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             const { data } = await axios.get('/api/user');
             commit(SET_USER, data);
-            // Cookies.set('token', token, { expires: remember ? 365 : null })
         },
         [LOGOUT]({ commit }) {
             commit(SET_TOKEN, null);
