@@ -20,5 +20,6 @@ Route::namespace('Api')->group(function() {
     Route::middleware('auth:api')->group(function() {
         Route::get('/user', 'UsersController@show');
         Route::resource('users', 'UsersController');
+        Route::get('/roles', 'RolesController@index')->name('roles.index');
     });
 });

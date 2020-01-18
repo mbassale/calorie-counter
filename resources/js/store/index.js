@@ -1,8 +1,9 @@
-
+import _ from 'lodash';
 import createPersistedState from 'vuex-persistedstate';
 
 import {
     SET_TOKEN,
+    SET_ROLES,
     SET_USER,
     SET_USERS
 } from './mutations';
@@ -10,7 +11,8 @@ import {
 import {
     LOGIN,
     LOGOUT,
-    LOAD_USERS
+    LOAD_ROLES,
+    LOAD_USERS, UPDATE_USER
 } from './actions';
 
 import { ROLE_ADMIN, ROLE_MANAGER, ROLE_USER } from './roles';
@@ -28,6 +30,7 @@ export default {
     state: {
         user: null,
         token: null,
+        roles: [],
         users: []
     },
     getters: {
@@ -51,6 +54,9 @@ export default {
         [SET_USER](state, user) {
             state.user = user;
         },
+        [SET_ROLES](state, roles) {
+            state.roles = roles || [];
+        },
         [SET_USERS](state, users) {
             state.users = users || [];
         }
@@ -67,9 +73,22 @@ export default {
             commit(SET_USER, null);
             return Promise.resolve();
         },
+        async [LOAD_ROLES]({ commit }) {
+            const { data } = await axios.get('/api/roles');
+            commit(SET_ROLES, data);
+        },
         async [LOAD_USERS]({ commit }) {
             const { data } = await axios.get('/api/users');
             commit(SET_USERS, data);
+        },
+        async [UPDATE_USER]({ dispatch, commit, state }, payload) {
+            const { data: user } = await axios.put('/api/users/' + payload.id, payload);
+            let userIndex = state.users.findIndex(u => u.id === user.id);
+            if (userIndex >= 0) {
+                let updatedUsers = _.cloneDeep(state.users);
+                updatedUsers.splice(userIndex, 1, user);
+                commit(SET_USERS, updatedUsers);
+            }
         }
     }
 };

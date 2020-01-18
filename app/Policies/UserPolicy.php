@@ -99,4 +99,9 @@ class UserPolicy
     {
         return $user->isManager();
     }
+
+    public function updateRole(User $user)
+    {
+        return $user->isAdmin();
+    }
 }
