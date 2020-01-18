@@ -17,12 +17,14 @@
                                         <div class="form-group">
                                             <input type="email" class="form-control form-control-user"
                                                    placeholder="Enter Email Address..."
-                                                   v-model="email" :disabled="disabled">
+                                                   v-model="email" :disabled="disabled"
+                                                   @keydown.enter="handleLogin">
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
                                                    placeholder="Password"
-                                                   v-model="password" :disabled="disabled">
+                                                   v-model="password" :disabled="disabled"
+                                                   @keydown.enter="handleLogin">
                                         </div>
                                         <div class="form-group">
                                             <div class="custom-control custom-checkbox small">
