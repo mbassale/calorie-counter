@@ -11,21 +11,24 @@ class UsersTableSeeder extends Seeder
         [
             'id' => 1,
             'role_id' => Role::ADMIN,
-            'name' => 'Administrator',
+            'first_name' => 'Administrator',
+            'last_name' => 'System',
             'email' => 'admin@example.com',
             'password' => 'toptal2020'
         ],
         [
             'id' => 2,
             'role_id' => Role::MANAGER,
-            'name' => 'John Doe',
+            'first_name' => 'John',
+            'last_name' => 'Doe',
             'email' => 'john.doe@example.com',
             'password' => 'toptal2020'
         ],
         [
             'id' => 3,
             'role_id' => Role::USER,
-            'name' => 'Jane Doe',
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
             'email' => 'jane.doe@example.com',
             'password' => 'toptal2020'
         ]
