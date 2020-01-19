@@ -61,6 +61,8 @@ class UserPolicy
      */
     public function update(User $user, User $model)
     {
+        // user can update itself
+        if ($user->id == $model->id) return true;
         return $user->isManager();
     }
 

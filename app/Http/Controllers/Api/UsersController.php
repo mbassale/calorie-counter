@@ -25,13 +25,13 @@ class UsersController extends Controller
     {
         $this->authorize('update', $user);
         $this->validate($request, [
-            'role_id' => 'required',
+            'role_id' => 'nullable|exists:roles,id',
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'required'
         ]);
         $user->update($request->only(['first_name', 'last_name', 'email']));
-        if ($user->role_id != $request->role_id) {
+        if ($request->has('role_id') && $user->role_id != $request->role_id) {
             $this->authorize('updateRole', User::class);
             $user->role_id = $request->input('role_id');
             $user->save();
