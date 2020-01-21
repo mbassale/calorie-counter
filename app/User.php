@@ -43,6 +43,11 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id');
     }
 
+    public function meals()
+    {
+        return $this->hasMany(Meal::class, 'user_id');
+    }
+
     public function isAdmin()
     {
         return $this->role_id == Role::ADMIN;
