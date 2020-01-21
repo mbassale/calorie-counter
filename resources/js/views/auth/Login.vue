@@ -13,6 +13,7 @@
                                     <div class="text-center">
                                         <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
                                     </div>
+                                    <b-alert :show="error" dismissible variant="danger">{{ error }}</b-alert>
                                     <form class="user">
                                         <div class="form-group">
                                             <input type="email" class="form-control form-control-user"
@@ -28,7 +29,7 @@
                                         </div>
                                         <button type="button" class="btn btn-primary btn-user btn-block"
                                                 @click="handleLogin" :disabled="disabled">
-                                            Login
+                                            <fa-icon v-if="isProcessing" icon="spinner" spin /> Login
                                         </button>
                                     </form>
                                     <hr>
@@ -66,7 +67,10 @@
             return {
                 isProcessing: false,
                 email: null,
-                password: null
+                password: null,
+                error: null,
+                invalidEmail: false,
+                invalidPassword: false
             };
         },
         computed: {
@@ -76,6 +80,7 @@
         },
         methods: {
             handleLogin() {
+                this.error = null;
                 this.isProcessing = true;
                 axios.post('/api/login', {
                     email: this.email,
@@ -88,6 +93,19 @@
                             .finally(() => this.isProcessing = false);
                     }
                 }).catch(error => {
+                    if (error.response) {
+                        let data = error.response.data;
+                        if (_.isObject(data) && _.isObject(data.errors)) {
+                            if (data.errors.password) {
+                                this.error = 'Invalid password';
+                            }
+                            if (data.errors.email) {
+                                this.error = 'Invalid email';
+                            }
+                        } else if (_.isString(data)) {
+                            this.error = data || null;
+                        }
+                    }
                     this.isProcessing = false;
                 });
             }
