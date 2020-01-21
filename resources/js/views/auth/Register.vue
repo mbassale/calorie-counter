@@ -10,36 +10,52 @@
                             <div class="text-center">
                                 <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
                             </div>
-                            <form class="user">
-                                <div class="form-group row">
+                            <b-form class="user">
+                                <b-form-row>
                                     <div class="col-sm-6 mb-3 mb-sm-0">
-                                        <input type="text" class="form-control form-control-user" placeholder="First Name"
-                                               v-model="first_name" :disabled="disabled">
+                                        <b-form-group :state="$v.first_name.$error ? false : null">
+                                            <b-input type="text" class="form-control-user" placeholder="First Name"
+                                                     v-model="first_name" :state="$v.first_name.$error ? false : null"
+                                                     :disabled="disabled"/>
+                                        </b-form-group>
                                     </div>
                                     <div class="col-sm-6">
-                                        <input type="text" class="form-control form-control-user" placeholder="Last Name"
-                                               v-model="last_name" :disabled="disabled">
+                                        <b-form-group :state="$v.last_name.$error ? false : null">
+                                            <b-input type="text" class="form-control-user" placeholder="Last Name"
+                                                     v-model="last_name" :state="$v.last_name.$error ? false : null"
+                                                     :disabled="disabled"/>
+                                        </b-form-group>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <input type="email" class="form-control form-control-user" placeholder="Email Address"
-                                           v-model="email" :disabled="disabled">
-                                </div>
-                                <div class="form-group row">
+                                </b-form-row>
+                                <b-form-group :state="$v.email.$error ? false : null">
+                                    <b-input type="email" class="form-control-user" placeholder="Email Address"
+                                             v-model="email" :state="$v.email.$error ? false : null"
+                                             :disabled="disabled"/>
+                                </b-form-group>
+                                <b-form-row>
                                     <div class="col-sm-6 mb-3 mb-sm-0">
-                                        <input type="password" class="form-control form-control-user" placeholder="Password"
-                                               v-model="password" :disabled="disabled">
+                                        <b-form-group :state="$v.password.$error ? false : null">
+                                            <b-input type="password" class="form-control-user" placeholder="Password"
+                                                     v-model="password" :state="$v.password.$error ? false : null"
+                                                     :disabled="disabled"/>
+                                        </b-form-group>
                                     </div>
                                     <div class="col-sm-6">
-                                        <input type="password" class="form-control form-control-user" placeholder="Repeat Password"
-                                               v-model="password_confirmation" :disabled="disabled">
+                                        <b-form-group :state="$v.password_confirmation.$error ? false : null">
+                                            <b-input type="password" class="form-control-user"
+                                                     placeholder="Repeat Password"
+                                                     v-model="password_confirmation"
+                                                     :state="$v.password_confirmation.$error ? false : null"
+                                                     :disabled="disabled"/>
+                                        </b-form-group>
                                     </div>
-                                </div>
+                                </b-form-row>
                                 <button class="btn btn-primary btn-user btn-block" @click="handleRegister"
-                                        :disabled="isProcessing || invalid">
-                                    <fa-icon v-if="isProcessing" icon="spinner" spin /> Register Account
+                                        :disabled="isProcessing || $v.$anyError">
+                                    <fa-icon v-if="isProcessing" icon="spinner" spin/>
+                                    Register Account
                                 </button>
-                            </form>
+                            </b-form>
                             <hr>
                             <div class="text-center">
                                 <button class="btn btn-link" @click="$router.push({ name: 'forgotPassword' })"
@@ -64,6 +80,7 @@
 <script>
     import _ from 'lodash';
     import axios from 'axios';
+    import {required, minLength, email, sameAs} from 'vuelidate/lib/validators'
     import {LOGIN} from "../../store/actions";
 
     export default {
@@ -81,15 +98,35 @@
         computed: {
             disabled() {
                 return this.isProcessing;
+            }
+        },
+        validations: {
+            first_name: {
+                required,
+                minLength: minLength(2)
             },
-            invalid() {
-                return _.isEmpty(this.first_name) || _.isEmpty(this.last_name) ||
-                    _.isEmpty(this.email) || _.isEmpty(this.password) || _.isEmpty(this.password_confirmation) ||
-                    this.password !== this.password_confirmation;
+            last_name: {
+                required,
+                minLength: minLength(2)
+            },
+            email: {
+                required,
+                email
+            },
+            password: {
+                required,
+                minLength: minLength(6)
+            },
+            password_confirmation: {
+                sameAsPassword: sameAs('password')
             }
         },
         methods: {
             handleRegister() {
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    return;
+                }
                 this.isProcessing = true;
                 let data = _.pick(this, ['first_name', 'last_name', 'email', 'password', 'password_confirmation']);
                 axios.post('/api/register', data).then(response => {

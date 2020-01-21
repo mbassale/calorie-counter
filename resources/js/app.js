@@ -24,6 +24,12 @@ library.add(fas);
 Vue.component('fa-icon', FontAwesomeIcon);
 
 /**
+ * Vuelidate Validation
+ */
+import Vuelidate from 'vuelidate';
+Vue.use(Vuelidate);
+
+/**
  * Vuex Store
  */
 import Vuex from 'vuex';
