@@ -6,8 +6,12 @@
 
         <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav>
-                <b-nav-item :to="{ name: 'dashboard' }">Dashboard</b-nav-item>
-                <b-nav-item v-if="isAdmin || isManager" :to="{ name: 'users' }">Users</b-nav-item>
+                <b-nav-item v-if="isAdmin || isManager" :to="{ name: 'users' }">
+                    <fa-icon icon="users" /> Users
+                </b-nav-item>
+                <b-nav-item v-if="isAdmin || isUser" :to="{ name: 'meals' }">
+                    <fa-icon icon="utensils" /> Meals
+                </b-nav-item>
             </b-navbar-nav>
 
             <!-- Right aligned nav items -->

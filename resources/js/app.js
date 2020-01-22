@@ -43,11 +43,11 @@ const store = new Vuex.Store(Store);
 import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 import App from './App.vue';
-import Dashboard from './views/dashboard/Dashboard.vue'
 import Login from './views/auth/Login.vue';
 import Register from './views/auth/Register.vue';
 import ForgotPassword from './views/auth/ForgotPassword.vue';
 import Users from './views/users/Users.vue';
+import Meals from './views/meals/Meals.vue';
 
 const router = new VueRouter({
     mode: 'history',
@@ -55,7 +55,10 @@ const router = new VueRouter({
         {
             path: '/',
             name: 'dashboard',
-            component: Dashboard
+            beforeEnter: (to, from, next) => {
+                if (store.getters.isAdmin || store.getters.isUser) next('/meals');
+                else next('/users');
+            }
         },
         {
             path: '/login',
@@ -78,6 +81,15 @@ const router = new VueRouter({
             component: Users,
             beforeEnter: (to, from, next) => {
                 if (store.getters.isAdmin || store.getters.isManager) next();
+                else next('/');
+            }
+        },
+        {
+            path: '/meals',
+            name: 'meals',
+            component: Meals,
+            beforeEnter: (to, from, next) => {
+                if (store.getters.isAdmin || store.getters.isUser) next();
                 else next('/');
             }
         }

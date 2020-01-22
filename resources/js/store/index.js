@@ -1,11 +1,13 @@
 import _ from 'lodash';
+import axios from 'axios';
 import createPersistedState from 'vuex-persistedstate';
 
 import {
     SET_TOKEN,
     SET_ROLES,
     SET_USER,
-    SET_USERS
+    SET_USERS,
+    SET_MEALS
 } from './mutations';
 
 import {
@@ -14,7 +16,11 @@ import {
     LOAD_ROLES,
     LOAD_USERS,
     UPDATE_USER,
-    DELETE_USER
+    DELETE_USER,
+    LOAD_MEALS,
+    CREATE_MEAL,
+    UPDATE_MEAL,
+    DELETE_MEAL
 } from './actions';
 
 import { ROLE_ADMIN, ROLE_MANAGER, ROLE_USER } from './roles';
@@ -33,7 +39,8 @@ export default {
         user: null,
         token: null,
         roles: [],
-        users: []
+        users: [],
+        meals: [],
     },
     getters: {
         isGuest(state) {
@@ -61,6 +68,9 @@ export default {
         },
         [SET_USERS](state, users) {
             state.users = users || [];
+        },
+        [SET_MEALS](state, meals) {
+            state.meals = meals || [];
         }
     },
     actions: {
@@ -83,7 +93,7 @@ export default {
             const { data } = await axios.get('/api/users');
             commit(SET_USERS, data);
         },
-        async [UPDATE_USER]({ dispatch, commit, state }, payload) {
+        async [UPDATE_USER]({ commit, state }, payload) {
             const { data: user } = await axios.put('/api/users/' + payload.id, payload);
             let userIndex = state.users.findIndex(u => u.id === user.id);
             if (userIndex >= 0) {
@@ -99,6 +109,34 @@ export default {
                 let updatedUsers = _.cloneDeep(state.users);
                 updatedUsers.splice(userIndex, 1);
                 commit(SET_USERS, updatedUsers);
+            }
+        },
+        async [LOAD_MEALS]({ commit }) {
+            const { data } = await axios.get('/api/meals');
+            commit(SET_MEALS, data);
+        },
+        async [CREATE_MEAL]({ commit, state }, payload) {
+            const { data: meal } = await axios.post('/api/meals', payload);
+            let updatedMeals = _.cloneDeep(state.meals);
+            updatedMeals.push(meal);
+            commit(SET_MEALS, updatedMeals);
+        },
+        async [UPDATE_MEAL]({ commit, state }, payload) {
+            const { data: meal } = await axios.put('/api/meals/' + payload.id, payload);
+            let mealIndex = state.meals.findIndex(m => m.id === meal.id);
+            if (mealIndex >= 0) {
+                let updatedMeals = _.cloneDeep(state.meals);
+                updatedMeals.splice(mealIndex, 1, meal);
+                commit(SET_MEALS, updatedMeals);
+            }
+        },
+        async [DELETE_MEAL]({ commit, state }, payload) {
+            const { data: meal } = await axios.delete('/api/meals/' + payload.id);
+            let mealIndex = state.meals.findIndex(m => m.id === meal.id);
+            if (mealIndex >= 0) {
+                let updatedMeals = _.cloneDeep(state.meals);
+                updatedMeals.splice(mealIndex, 1);
+                commit(SET_MEALS, updatedMeals);
             }
         }
     }
