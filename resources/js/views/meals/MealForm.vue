@@ -10,10 +10,18 @@
                           :disabled="disabled" />
         </b-form-group>
 
-        <b-form-group label="Last Name" label-for="date">
-            <b-form-input id="date" v-model="date" placeholder="Date"
-                          :disabled="disabled" />
-        </b-form-group>
+        <b-form-row>
+            <div class="col-auto">
+                <b-form-group label="Date" label-for="date">
+                    <VueDatePicker v-model="date" class="form-control" format="YYYY-MM-DD" :disabled="disabled" />
+                </b-form-group>
+            </div>
+            <div class="col-auto mr-auto">
+                <b-form-group label="Time" label-for="time">
+                    <masked-input v-model="time" class="form-control" mask="11:11" placeholder="Time" :disabled="disabled" />
+                </b-form-group>
+            </div>
+        </b-form-row>
 
         <b-form-group label="Calories" label-for="calories">
             <b-form-input id="calories" type="number" min="0" step="1" placeholder="Calories"
@@ -37,12 +45,19 @@
 
 <script>
     import _ from 'lodash';
+    import moment from 'moment';
     import { mapState, mapGetters } from 'vuex';
     import {CREATE_MEAL, LOAD_USERS, UPDATE_MEAL} from '../../store/actions';
     import ToastMixin from '../../mixins/ToastMixin';
+    import { VueDatePicker } from '@mathieustan/vue-datepicker';
+    import MaskedInput from 'vue-masked-input';
 
     export default {
         name: 'MealForm',
+        components: {
+            VueDatePicker,
+            MaskedInput
+        },
         mixins: [ToastMixin],
         props: {
             meal: {
@@ -59,6 +74,7 @@
                 user_id: null,
                 name: null,
                 date: null,
+                time: null,
                 calories: null
             };
         },
@@ -102,14 +118,19 @@
                     this.id = this.meal.id;
                     this.user_id = this.meal.user_id;
                     this.name = this.meal.name;
-                    this.date = this.meal.date;
                     this.calories = this.meal.calories;
+                    let dateTime = moment(this.meal.date);
+                    if (dateTime.isValid()) {
+                        this.date = dateTime.format('YYYY-MM-DD');
+                        this.time = dateTime.format('HH:mm');
+                    }
                 }
             },
             onSubmit(evt) {
                 evt.preventDefault();
                 this.isProcessing = true;
-                const data = _.pick(this, ['id', 'user_id', 'name', 'date', 'calories']);
+                const data = _.pick(this, ['id', 'user_id', 'name', 'calories']);
+                data.date = this.date + ' ' + this.time + ':00';
                 let request = null;
                 if (this.meal && this.meal.id) {
                     request = this.$store.dispatch(UPDATE_MEAL, data)
