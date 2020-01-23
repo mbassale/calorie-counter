@@ -58,8 +58,7 @@
                             </b-form>
                             <hr>
                             <div class="text-center">
-                                <button class="btn btn-link" @click="$router.push({ name: 'forgotPassword' })"
-                                        :disabled="disabled">
+                                <button class="btn btn-link" :disabled="true">
                                     Forgot Password?
                                 </button>
                             </div>

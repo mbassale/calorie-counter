@@ -34,9 +34,7 @@
                                     </form>
                                     <hr>
                                     <div class="text-center">
-                                        <button type="button" class="btn btn-link"
-                                                @click="$router.push({ name: 'forgotPassword' })"
-                                                :disabled="disabled">
+                                        <button type="button" class="btn btn-link" :disabled="true">
                                             Forgot Password?
                                         </button>
                                     </div>
