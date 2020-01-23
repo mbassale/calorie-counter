@@ -128,13 +128,18 @@
             },
             ...mapState(['meals'])
         },
+        watch: {
+            meals() {
+                this.isCreating = false;
+            }
+        },
         mounted() {
             this.$nextTick(() => this.loadData());
         },
         methods: {
             loadData() {
                 this.isLoading = true;
-                this.$store.dispatch(LOAD_MEALS)
+                return this.$store.dispatch(LOAD_MEALS)
                     .catch(error => this.showNetworkError(error))
                     .finally(() => this.isLoading = false);
             },
