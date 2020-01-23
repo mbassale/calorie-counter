@@ -83,7 +83,7 @@
                         label: 'Time',
                         sortable: true,
                         formatter: (value, key, item) => {
-                            return moment(item.date).format('h:MM a');
+                            return moment(item.date).format('H:mm');
                         }
                     },
                     {
