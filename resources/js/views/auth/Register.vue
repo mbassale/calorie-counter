@@ -121,7 +121,8 @@
             }
         },
         methods: {
-            handleRegister() {
+            handleRegister(evt) {
+                evt.preventDefault();
                 this.$v.$touch();
                 if (this.$v.$invalid) {
                     return;
