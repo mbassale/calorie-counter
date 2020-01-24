@@ -80,7 +80,7 @@
         },
         computed: {
             disabled() {
-                return this.isLoading;
+                return this.isLoading || this.isProcessing;
             },
             selectUsers() {
                 return this.users.map(user => {
@@ -92,6 +92,11 @@
             },
             ...mapState(['users']),
             ...mapGetters(['isAdmin'])
+        },
+        watch: {
+            meal() {
+                this.resetForm();
+            }
         },
         mounted() {
             this.resetForm();
@@ -113,6 +118,7 @@
                 this.user_id = null;
                 this.name = null;
                 this.date = null;
+                this.time = null;
                 this.calories = null;
                 if (this.meal) {
                     this.id = this.meal.id;
