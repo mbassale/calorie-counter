@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Meal;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class MealsController extends Controller
 {
@@ -12,7 +11,7 @@ class MealsController extends Controller
     {
         $this->authorize('viewAny', Meal::class);
         $user = $request->user();
-        $query = Meal::query();
+        $query = Meal::query()->with('user');
         if (!$user->isAdmin()) {
             $query->where('user_id', $user->id);
         }
@@ -22,6 +21,7 @@ class MealsController extends Controller
     public function show(Request $request, Meal $meal = null)
     {
         $this->authorize('view', $meal);
+        $meal->load('user');
         return $meal;
     }
 
@@ -39,7 +39,9 @@ class MealsController extends Controller
         if ($user->isUser() || !$mealData['user_id']) {
             $mealData['user_id'] = $user->id;
         }
-        return Meal::create($mealData);
+        $meal = Meal::create($mealData);
+        $meal->load('user');
+        return $meal;
     }
 
     public function update(Request $request, Meal $meal)
@@ -51,12 +53,14 @@ class MealsController extends Controller
             'calories' => 'required'
         ]);
         $meal->update($request->only(['name', 'date', 'calories']));
+        $meal->load('user');
         return $meal;
     }
 
     public function destroy(Meal $meal)
     {
         $this->authorize('delete', $meal);
+        $meal->load('user');
         $meal->delete();
         return $meal;
     }

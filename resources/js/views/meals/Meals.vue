@@ -44,7 +44,7 @@
 <script>
     import _ from 'lodash';
     import moment from 'moment';
-    import { mapState } from 'vuex';
+    import { mapState, mapGetters } from 'vuex';
     import { DELETE_MEAL, LOAD_MEALS } from '../../store/actions';
     import MealForm from './MealForm.vue';
     import ToastMixin from '../../mixins/ToastMixin';
@@ -60,12 +60,20 @@
             return {
                 isLoading: false,
                 isCreating: false,
-                isDeletingId: null,
-                fields: [
+                isDeletingId: null
+            };
+        },
+        computed: {
+            disabled() {
+                return this.isLoading;
+            },
+            fields() {
+                const tableFields = [
                     {
                         key: 'day',
                         label: 'Day',
                         sortable: true,
+                        sortByFormatted: true,
                         formatter: (value, key, item) => {
                             return moment(item.date).format('dddd');
                         }
@@ -74,6 +82,7 @@
                         key: 'date',
                         label: 'Date',
                         sortable: true,
+                        sortByFormatted: true,
                         formatter: (value, key, item) => {
                             return moment(item.date).format('YYYY-MM-DD');
                         }
@@ -82,6 +91,7 @@
                         key: 'time',
                         label: 'Time',
                         sortable: true,
+                        sortByFormatted: true,
                         formatter: (value, key, item) => {
                             return moment(item.date).format('H:mm');
                         }
@@ -101,12 +111,15 @@
                         label: '',
                         sortable: false
                     }
-                ]
-            };
-        },
-        computed: {
-            disabled() {
-                return this.isLoading;
+                ];
+                if (this.isAdmin) {
+                    tableFields.unshift({
+                        key: 'user.full_name',
+                        label: 'User',
+                        sortable: true
+                    });
+                }
+                return tableFields;
             },
             orderedMeals() {
                 let meals = _.orderBy(this.meals.map(meal => {
@@ -126,7 +139,8 @@
                 }
                 return meals;
             },
-            ...mapState(['meals'])
+            ...mapState(['meals']),
+            ...mapGetters(['isAdmin'])
         },
         watch: {
             meals() {
