@@ -5,15 +5,20 @@
                 <h1><fa-icon icon="utensils" /> Meals</h1>
             </div>
             <div class="col-auto">
-                <b-button type="button" variant="primary" @click="handleCreate">
+                <b-button type="button" variant="primary" @click="isFiltering = true" :disabled="disabled || isFiltering">
+                    <fa-icon icon="search" /> Search
+                </b-button>
+                <b-button type="button" variant="primary" @click="handleCreate" :disabled="disabled || isFiltering">
                     <fa-icon icon="plus" /> New Meal
                 </b-button>
-                <b-button type="button" variant="secondary" title="Refresh" @click="loadData">
+                <b-button type="button" variant="secondary" title="Refresh" @click="loadData" :disabled="disabled">
                     <fa-icon v-if="isLoading" icon="spinner" spin />
                     <fa-icon v-else icon="sync" />
                 </b-button>
             </div>
         </div>
+        <meal-search v-if="isFiltering" :disabled="disabled"
+                     @search="handleSearch" @reset="handleSearchReset" @cancel="isFiltering = false" />
         <b-table striped hover show-empty responsive="md" :items="orderedMeals" :fields="fields" :busy="isLoading">
             <template v-slot:cell(actions)="data">
                 <b-button variant="primary" size="sm" title="Edit" @click="data.toggleDetails"
@@ -45,27 +50,30 @@
     import _ from 'lodash';
     import moment from 'moment';
     import { mapState, mapGetters } from 'vuex';
-    import { DELETE_MEAL, LOAD_MEALS } from '../../store/actions';
+    import {DELETE_MEAL, LOAD_MEALS, SEARCH_MEALS} from '../../store/actions';
     import MealForm from './MealForm.vue';
+    import MealSearch from './MealSearch.vue';
     import ToastMixin from '../../mixins/ToastMixin';
     import ConfirmModalMixin from '../../mixins/ConfirmModalMixin';
 
     export default {
         name: 'Meals',
         components: {
-            MealForm
+            MealForm,
+            MealSearch
         },
         mixins: [ToastMixin, ConfirmModalMixin],
         data() {
             return {
                 isLoading: false,
                 isCreating: false,
-                isDeletingId: null
+                isDeletingId: null,
+                isFiltering: false
             };
         },
         computed: {
             disabled() {
-                return this.isLoading;
+                return this.isLoading || this.isCreating || this.isDeletingId;
             },
             fields() {
                 const tableFields = [
@@ -152,6 +160,21 @@
         },
         methods: {
             loadData() {
+                this.isCreating = false;
+                this.isFiltering = false;
+                this.isLoading = true;
+                return this.$store.dispatch(LOAD_MEALS)
+                    .catch(error => this.showNetworkError(error))
+                    .finally(() => this.isLoading = false);
+            },
+            handleSearch(search) {
+                this.isLoading = true;
+                this.isCreating = false;
+                return this.$store.dispatch(SEARCH_MEALS, search)
+                    .catch(error => this.showNetworkError(error))
+                    .finally(() => this.isLoading = false);
+            },
+            handleSearchReset() {
                 this.isLoading = true;
                 return this.$store.dispatch(LOAD_MEALS)
                     .catch(error => this.showNetworkError(error))

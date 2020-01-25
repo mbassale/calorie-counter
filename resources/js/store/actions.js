@@ -7,6 +7,7 @@ export const CREATE_USER = 'createUser';
 export const UPDATE_USER = 'updateUser';
 export const DELETE_USER = 'deleteUser';
 export const LOAD_MEALS  = 'loadMeals';
+export const SEARCH_MEALS = 'searchMeals';
 export const CREATE_MEAL = 'createMeal';
 export const UPDATE_MEAL  = 'updateMeal';
 export const DELETE_MEAL  = 'deleteMeal';

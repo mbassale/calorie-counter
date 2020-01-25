@@ -19,6 +19,7 @@ import {
     UPDATE_USER,
     DELETE_USER,
     LOAD_MEALS,
+    SEARCH_MEALS,
     CREATE_MEAL,
     UPDATE_MEAL,
     DELETE_MEAL
@@ -136,7 +137,19 @@ export default {
         [LOAD_MEALS]({ commit }) {
             return axios.get('/api/meals').then(response => {
                 commit(SET_MEALS, response.data || []);
-            })
+            });
+        },
+        [SEARCH_MEALS]({ commit }, payload) {
+            const searchParams = _.reduce(payload, (params, value, key) => {
+                if (!_.isEmpty(value) && !_.isEmpty(key)) {
+                    params.push(key + '=' + value);
+                }
+                return params;
+            }, []);
+            const params = searchParams.join('&');
+            return axios.get('/api/meals?' + params).then(response => {
+                commit(SET_MEALS, response.data || []);
+            });
         },
         [CREATE_MEAL]({ commit, state }, payload) {
             return axios.post('/api/meals', payload).then(response => {

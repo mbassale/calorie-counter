@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Meal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MealsController extends Controller
 {
@@ -14,6 +15,18 @@ class MealsController extends Controller
         $query = Meal::query()->with('user');
         if (!$user->isAdmin()) {
             $query->where('user_id', $user->id);
+        }
+        if ($request->has('startDate')) {
+            $query->where('date', '>=', $request->startDate);
+        }
+        if ($request->has('startTime')) {
+            $query->whereRaw("TIME_TO_SEC(TIME(`date`)) >= TIME_TO_SEC('{$request->startTime}:00')");
+        }
+        if ($request->has('endDate')) {
+            $query->where('date', '<=', $request->endDate);
+        }
+        if ($request->has('endTime')) {
+            $query->whereRaw("TIME_TO_SEC(TIME(`date`)) <=  TIME_TO_SEC('{$request->endTime}:00')");
         }
         return $query->orderBy('date', 'desc')->get();
     }
