@@ -15,12 +15,13 @@ import {
     LOGOUT,
     LOAD_ROLES,
     LOAD_USERS,
+    CREATE_USER,
     UPDATE_USER,
     DELETE_USER,
     LOAD_MEALS,
     CREATE_MEAL,
     UPDATE_MEAL,
-    DELETE_MEAL, CREATE_USER
+    DELETE_MEAL
 } from './actions';
 
 import { ROLE_ADMIN, ROLE_MANAGER, ROLE_USER } from './roles';
@@ -74,76 +75,104 @@ export default {
         }
     },
     actions: {
-        async [LOGIN]({ commit, state }, { token }) {
+        [LOGIN]({ commit, state }, { token }) {
             commit(SET_TOKEN, token);
             window.axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            const { data } = await axios.get('/api/user');
-            commit(SET_USER, data);
+            return axios.get('/api/user').then(response => {
+                commit(SET_USER, response.data || []);
+            });
         },
         [LOGOUT]({ commit }) {
             commit(SET_TOKEN, null);
             commit(SET_USER, null);
             return Promise.resolve();
         },
-        async [LOAD_ROLES]({ commit }) {
-            const { data } = await axios.get('/api/roles');
-            commit(SET_ROLES, data);
+        [LOAD_ROLES]({ commit }) {
+            return axios.get('/api/roles').then(response => {
+                commit(SET_ROLES, response.data || []);
+            });
         },
-        async [LOAD_USERS]({ commit }) {
-            const { data } = await axios.get('/api/users');
-            commit(SET_USERS, data);
+        [LOAD_USERS]({ commit }) {
+            return axios.get('/api/users').then(response => {
+                commit(SET_USERS, response.data || []);
+            });
         },
-        async [CREATE_USER]({ commit, state }, payload) {
-            const { data: user } = await axios.post('/api/users', payload);
-            let updatedUsers = _.cloneDeep(state.users);
-            updatedUsers.push(user);
-            commit(SET_USERS, updatedUsers);
+        [CREATE_USER]({ commit, state }, payload) {
+            return axios.post('/api/users', payload).then(response => {
+                const user = response.data || null;
+                if (user) {
+                    const updatedUsers = _.cloneDeep(state.users);
+                    updatedUsers.push(user);
+                    commit(SET_USERS, updatedUsers);
+                }
+            });
         },
-        async [UPDATE_USER]({ commit, state }, payload) {
-            const { data: user } = await axios.put('/api/users/' + payload.id, payload);
-            let userIndex = state.users.findIndex(u => u.id === user.id);
-            if (userIndex >= 0) {
-                let updatedUsers = _.cloneDeep(state.users);
-                updatedUsers.splice(userIndex, 1, user);
-                commit(SET_USERS, updatedUsers);
-            }
+        [UPDATE_USER]({ commit, state }, payload) {
+            return axios.put('/api/users/' + payload.id, payload).then(response => {
+                const user = response.data || null;
+                if (user) {
+                    const userIndex = state.users.findIndex(u => u.id === user.id);
+                    if (userIndex >= 0) {
+                        const updatedUsers = _.cloneDeep(state.users);
+                        updatedUsers.splice(userIndex, 1, user);
+                        commit(SET_USERS, updatedUsers);
+                    }
+                }
+            });
         },
-        async [DELETE_USER]({ dispatch, commit, state }, payload) {
-            const { data: user } = await axios.delete('/api/users/' + payload.id);
-            let userIndex = state.users.findIndex(u => u.id === user.id);
-            if (userIndex >= 0) {
-                let updatedUsers = _.cloneDeep(state.users);
-                updatedUsers.splice(userIndex, 1);
-                commit(SET_USERS, updatedUsers);
-            }
+        [DELETE_USER]({ dispatch, commit, state }, payload) {
+            return axios.delete('/api/users/' + payload.id).then(response => {
+                const user = response.data || null;
+                if (user) {
+                    const userIndex = state.users.findIndex(u => u.id === user.id);
+                    if (userIndex >= 0) {
+                        const updatedUsers = _.cloneDeep(state.users);
+                        updatedUsers.splice(userIndex, 1);
+                        commit(SET_USERS, updatedUsers);
+                    }
+                }
+            });
         },
-        async [LOAD_MEALS]({ commit }) {
-            const { data } = await axios.get('/api/meals');
-            commit(SET_MEALS, data);
+        [LOAD_MEALS]({ commit }) {
+            return axios.get('/api/meals').then(response => {
+                commit(SET_MEALS, response.data || []);
+            })
         },
-        async [CREATE_MEAL]({ commit, state }, payload) {
-            const { data: meal } = await axios.post('/api/meals', payload);
-            let updatedMeals = _.cloneDeep(state.meals);
-            updatedMeals.push(meal);
-            commit(SET_MEALS, updatedMeals);
+        [CREATE_MEAL]({ commit, state }, payload) {
+            return axios.post('/api/meals', payload).then(response => {
+                const meal = response.data || null;
+                if (meal) {
+                    const updatedMeals = _.cloneDeep(state.meals);
+                    updatedMeals.push(meal);
+                    commit(SET_MEALS, updatedMeals);
+                }
+            });
         },
-        async [UPDATE_MEAL]({ commit, state }, payload) {
-            const { data: meal } = await axios.put('/api/meals/' + payload.id, payload);
-            let mealIndex = state.meals.findIndex(m => m.id === meal.id);
-            if (mealIndex >= 0) {
-                let updatedMeals = _.cloneDeep(state.meals);
-                updatedMeals.splice(mealIndex, 1, meal);
-                commit(SET_MEALS, updatedMeals);
-            }
+        [UPDATE_MEAL]({ commit, state }, payload) {
+            return axios.put('/api/meals/' + payload.id, payload).then(response => {
+                const meal = response.data || null;
+                if (meal) {
+                    const mealIndex = state.meals.findIndex(m => m.id === meal.id);
+                    if (mealIndex >= 0) {
+                        const updatedMeals = _.cloneDeep(state.meals);
+                        updatedMeals.splice(mealIndex, 1, meal);
+                        commit(SET_MEALS, updatedMeals);
+                    }
+                }
+            });
         },
-        async [DELETE_MEAL]({ commit, state }, payload) {
-            const { data: meal } = await axios.delete('/api/meals/' + payload.id);
-            let mealIndex = state.meals.findIndex(m => m.id === meal.id);
-            if (mealIndex >= 0) {
-                let updatedMeals = _.cloneDeep(state.meals);
-                updatedMeals.splice(mealIndex, 1);
-                commit(SET_MEALS, updatedMeals);
-            }
+        [DELETE_MEAL]({ commit, state }, payload) {
+            return axios.delete('/api/meals/' + payload.id).then(response => {
+                const meal = response.data || null;
+                if (meal) {
+                    const mealIndex = state.meals.findIndex(m => m.id === meal.id);
+                    if (mealIndex >= 0) {
+                        const updatedMeals = _.cloneDeep(state.meals);
+                        updatedMeals.splice(mealIndex, 1);
+                        commit(SET_MEALS, updatedMeals);
+                    }
+                }
+            });
         }
     }
 };
