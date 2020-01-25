@@ -117,6 +117,7 @@
                 minLength: minLength(6)
             },
             password_confirmation: {
+                required,
                 sameAsPassword: sameAs('password')
             }
         },
