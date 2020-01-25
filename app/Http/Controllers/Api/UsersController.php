@@ -21,6 +21,28 @@ class UsersController extends Controller
         return $user;
     }
 
+    public function store(Request $request)
+    {
+        $this->authorize('create', User::class);
+        $this->validate($request, [
+            'role_id' => 'required|exists:roles,id',
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed'
+        ]);
+
+        // create user and return login token
+        $user = User::create([
+            'role_id' => $request->role_id,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
+        return $user->load('role');
+    }
+
     public function update(Request $request, User $user)
     {
         $this->authorize('update', $user);
@@ -36,7 +58,7 @@ class UsersController extends Controller
             $user->role_id = $request->input('role_id');
             $user->save();
         }
-        if ($request->has('password') && $request->has('password_confirmed')) {
+        if ($request->has('password') && $request->has('password_confirmation')) {
             $this->validate($request, [
                 'password' => 'required|confirmed'
             ]);

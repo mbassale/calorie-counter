@@ -20,7 +20,7 @@ import {
     LOAD_MEALS,
     CREATE_MEAL,
     UPDATE_MEAL,
-    DELETE_MEAL
+    DELETE_MEAL, CREATE_USER
 } from './actions';
 
 import { ROLE_ADMIN, ROLE_MANAGER, ROLE_USER } from './roles';
@@ -92,6 +92,12 @@ export default {
         async [LOAD_USERS]({ commit }) {
             const { data } = await axios.get('/api/users');
             commit(SET_USERS, data);
+        },
+        async [CREATE_USER]({ commit, state }, payload) {
+            const { data: user } = await axios.post('/api/users', payload);
+            let updatedUsers = _.cloneDeep(state.users);
+            updatedUsers.push(user);
+            commit(SET_USERS, updatedUsers);
         },
         async [UPDATE_USER]({ commit, state }, payload) {
             const { data: user } = await axios.put('/api/users/' + payload.id, payload);

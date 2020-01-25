@@ -1,25 +1,51 @@
 <template>
     <b-form @submit="onSubmit" @reset="onReset">
-        <b-form-group v-if="isAdmin" label="Role" label-for="role_id">
-            <b-form-select id="role_id" v-model="role_id" :options="selectRoles" required
-                           :disabled="disabled"/>
-        </b-form-group>
+        <b-form-row>
+            <b-col>
+                <b-form-group v-if="isAdmin" label="Role" label-for="role_id"
+                              :state="$v.role_id.$error ? false : null">
+                    <b-form-select id="role_id" v-model="role_id" :options="selectRoles" :disabled="disabled"
+                                   :state="$v.role_id.$error ? false : null"/>
+                </b-form-group>
+            </b-col>
+            <b-col>
+                <b-form-group label="First Name" label-for="first_name"
+                              :state="$v.first_name.$error ? false : null">
+                    <b-form-input id="first_name" v-model="first_name" placeholder="Enter first name"
+                                  :disabled="disabled" :state="$v.first_name.$error ? false : null"/>
+                </b-form-group>
+            </b-col>
+            <b-col>
+                <b-form-group label="Last Name" label-for="last_name" :state="$v.last_name.$error ? false : null">
+                    <b-form-input id="last_name" v-model="last_name" placeholder="Enter last name"
+                                  :disabled="disabled" :state="$v.last_name.$error ? false : null"/>
+                </b-form-group>
+            </b-col>
+        </b-form-row>
 
-        <b-form-group label="First Name" label-for="first_name">
-            <b-form-input id="first_name" v-model="first_name" required placeholder="Enter first name"
-                          :disabled="disabled"/>
-        </b-form-group>
+        <b-form-row>
+            <b-col>
+                <b-form-group label="Email" label-for="email" :state="$v.email.$error ? false : null">
+                    <b-form-input id="email" type="email" v-model="email" placeholder="Enter email"
+                                  :disabled="disabled" :state="$v.email.$error ? false : null"/>
+                </b-form-group>
+            </b-col>
+            <b-col>
+                <b-form-group label="Password" label-for="email" :state="$v.password.$error ? false : null">
+                    <b-form-input id="email" type="password" v-model="password" placeholder="Password"
+                                  :disabled="disabled" :state="$v.password.$error ? false : null"/>
+                </b-form-group>
+            </b-col>
+            <b-col>
+                <b-form-group label="Repeat Password" label-for="email"
+                              :state="$v.password_confirmation.$error ? false : null">
+                    <b-form-input id="email" type="password" v-model="password_confirmation" placeholder="Repeat Password"
+                                  :disabled="disabled" :state="$v.password_confirmation.$error ? false : null"/>
+                </b-form-group>
+            </b-col>
+        </b-form-row>
 
-        <b-form-group label="Last Name" label-for="last_name">
-            <b-form-input id="last_name" v-model="last_name" required placeholder="Enter last name"
-                          :disabled="disabled"/>
-        </b-form-group>
-
-        <b-form-group label="Email" label-for="email">
-            <b-form-input id="email" type="email" v-model="email" required placeholder="Enter email" :disabled="disabled"/>
-        </b-form-group>
-
-        <b-button type="submit" variant="primary" :disabled="disabled">
+        <b-button type="submit" variant="primary" :disabled="disabled || $v.$anyError">
             <fa-icon v-if="isProcessing" icon="spinner" spin/>
             <fa-icon v-else icon="save"/>
             Save
@@ -37,17 +63,17 @@
 <script>
     import _ from 'lodash';
     import {mapState, mapGetters} from 'vuex';
-    import {LOAD_ROLES, UPDATE_USER} from '../../store/actions';
+    import {CREATE_USER, LOAD_ROLES, UPDATE_USER} from '../../store/actions';
     import ToastMixin from '../../mixins/ToastMixin';
+    import {minLength, required, email, sameAs} from 'vuelidate/lib/validators';
 
     export default {
         name: 'UserForm',
         mixins: [ToastMixin],
         props: {
             user: {
-                required: false,
-                validator: val => _.isNull(val) || _.isObject(val),
-                default: () => null,
+                required: true,
+                type: Object
             }
         },
         data() {
@@ -59,6 +85,8 @@
                 first_name: null,
                 last_name: null,
                 email: null,
+                password: null,
+                password_confirmation: null
             };
         },
         computed: {
@@ -76,6 +104,44 @@
             ...mapState(['roles']),
             ...mapGetters(['isAdmin'])
         },
+        validations() {
+            const schema = {
+                role_id: {
+                    required
+                },
+                first_name: {
+                    required,
+                    minLength: minLength(2)
+                },
+                last_name: {
+                    required,
+                    minLength: minLength(2)
+                },
+                email: {
+                    required,
+                    email
+                },
+                password: {
+                    minLength: minLength(6)
+                },
+                password_confirmation: {
+                    sameAsPassword: sameAs('password')
+                }
+            };
+            if (!this.user.id) {
+                _.assign(schema, {
+                    password: {
+                        required,
+                        minLength: minLength(6)
+                    },
+                    password_confirmation: {
+                        required,
+                        sameAsPassword: sameAs('password')
+                    }
+                });
+            }
+            return schema;
+        },
         mounted() {
             this.$nextTick(() => this.resetForm());
         },
@@ -86,12 +152,14 @@
                 this.first_name = null;
                 this.last_name = null;
                 this.email = null;
-                if (this.user) {
-                    this.id = this.user.id;
-                    this.role_id = this.user.role_id;
-                    this.first_name = this.user.first_name;
-                    this.last_name = this.user.last_name;
-                    this.email = this.user.email;
+                this.password = null;
+                this.password_confirmation = null;
+                if (this.user.id) {
+                    this.id = this.user.id || null;
+                    this.role_id = this.user.role_id || null;
+                    this.first_name = this.user.first_name || null;
+                    this.last_name = this.user.last_name || null;
+                    this.email = this.user.email || null;
                 }
                 if (_.isEmpty(this.roles)) {
                     this.isLoading = true;
@@ -100,11 +168,27 @@
             },
             onSubmit(evt) {
                 evt.preventDefault();
+                this.$v.$touch();
+                if (this.$v.$invalid) {
+                    return;
+                }
                 this.isProcessing = true;
-                this.$store.dispatch(UPDATE_USER, _.pick(this, ['id', 'role_id', 'first_name', 'last_name', 'email']))
-                    .then(() => this.showSuccess('User Updated'))
-                    .catch(error => this.showNetworkError(error))
-                    .finally(() => this.isProcessing = false);
+                const userData = _.pick(this, ['id', 'role_id', 'first_name', 'last_name', 'email']);
+                if (this.user.id) {
+                    if (this.password) {
+                        _.assign(userData, _.pick(this, ['password', 'password_confirmation']));
+                    }
+                    this.$store.dispatch(UPDATE_USER, userData)
+                        .then(() => this.showSuccess('User Updated'))
+                        .catch(error => this.showNetworkError(error))
+                        .finally(() => this.isProcessing = false);
+                } else {
+                    _.assign(userData, _.pick(this, ['password', 'password_confirmation']));
+                    this.$store.dispatch(CREATE_USER, userData)
+                        .then(() => this.showSuccess('User Created'))
+                        .catch(error => this.showNetworkError(error))
+                        .finally(() => this.isProcessing = false);
+                }
             },
             onReset(evt) {
                 evt.preventDefault();
