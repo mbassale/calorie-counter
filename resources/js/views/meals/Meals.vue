@@ -215,6 +215,7 @@
             handleCaloriesPerDayUpdated() {
                 this.showSuccess('Calories Per Day Updated');
                 this.isSettingCaloriesPerDay = false;
+                return this.loadData();
             },
             handleDelete(meal) {
                 return this.showConfirmDeletionModal('Are you sure to delete this meal?')

@@ -3,10 +3,21 @@
 namespace App\Observers;
 
 use App\Meal;
+use App\Services\MealServiceInterface;
 use Carbon\Carbon;
 
 class MealObserver
 {
+    /**
+     * @var MealServiceInterface
+     */
+    protected $mealService;
+
+    public function __construct(MealServiceInterface $mealService)
+    {
+        $this->mealService = $mealService;
+    }
+
     /**
      * Handle the meal "created" event.
      *
@@ -48,17 +59,8 @@ class MealObserver
     {
         $mealUser = $meal->user;
         $maxCaloriesPerDay = $mealUser->calories_per_day;
-        if ($maxCaloriesPerDay >= 0) {
-            $mealDate = Carbon::instance($meal->date);
-            $startDate = $mealDate->copy()->startOfDay();
-            $endDate = $mealDate->copy()->endOfDay();
-            $mealsOfDay = Meal::query()
-                ->where('user_id', $mealUser->id)
-                ->where('date', '>=', $startDate)
-                ->where('date', '<=', $endDate);
-            $caloriesOfDay = with(clone $mealsOfDay)->sum('calories');
-            $isGettingFit = $caloriesOfDay <= $maxCaloriesPerDay;
-            with(clone $mealsOfDay)->update(['is_getting_fit' => $isGettingFit]);
+        if ($maxCaloriesPerDay > 0) {
+            $this->mealService->processCaloriesPerDay($meal);
         }
     }
 }
