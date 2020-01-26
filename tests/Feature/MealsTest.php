@@ -212,7 +212,7 @@ class MealsTest extends TestCase
         $updatedData['name'] = 'TEST NAME';
         $response = $this->json('PUT', "/api/meals/{$randomMealFromUser2->id}", $updatedData);
         $response->assertStatus(403);
-        $this->assertDatabaseHas('meals', $randomMealFromUser2->toArray());
+        $this->assertDatabaseHas('meals', Arr::only($randomMealFromUser2->toArray(), ['id', 'user_id', 'name', 'calories']));
     }
 
     public function testDestroy()
