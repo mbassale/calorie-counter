@@ -2,7 +2,7 @@
     <b-form @submit="onSubmit" @reset="onReset">
         <b-alert variant="danger" dismissible :show="error">{{ error }}</b-alert>
         <b-form-row>
-            <b-col>
+            <b-col v-if="!isUser">
                 <b-form-group label="Role" label-for="role_id"
                               :state="$v.role_id.$error ? false : null">
                     <b-form-select id="role_id" v-model="role_id" :options="selectRoles" :disabled="disabled"
@@ -123,7 +123,8 @@
                     };
                 });
             },
-            ...mapState(['roles'])
+            ...mapState(['roles']),
+            ...mapGetters(['isUser'])
         },
         validations() {
             const schema = {

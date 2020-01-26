@@ -21,7 +21,7 @@
                     <template v-slot:button-content>
                         <b-icon icon="person-fill" /> {{ userFirstName }}
                     </template>
-                    <b-dropdown-item disabled><b-icon icon="toggles" /> Profile</b-dropdown-item>
+                    <b-dropdown-item :to="{ name: 'profile' }"><b-icon icon="toggles" /> Profile</b-dropdown-item>
                     <b-dropdown-item @click="handleLogout">
                         <b-icon icon="box-arrow-left" /> Sign Out
                     </b-dropdown-item>

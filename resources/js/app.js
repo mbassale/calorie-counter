@@ -48,6 +48,7 @@ import Register from './views/auth/Register.vue';
 import ForgotPassword from './views/auth/ForgotPassword.vue';
 import Users from './views/users/Users.vue';
 import Meals from './views/meals/Meals.vue';
+import UserProfile from './views/users/UserProfile.vue';
 
 const router = new VueRouter({
     mode: 'history',
@@ -92,7 +93,12 @@ const router = new VueRouter({
                 if (store.getters.isAdmin || store.getters.isUser) next();
                 else next('/');
             }
-        }
+        },
+        {
+            path: '/profile',
+            name: 'profile',
+            component: UserProfile
+        },
     ],
 });
 

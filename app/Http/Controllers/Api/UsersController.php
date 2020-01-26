@@ -19,6 +19,7 @@ class UsersController extends Controller
     {
         if (!$user) $user = $request->user();
         $this->authorize('view', $user);
+        $user->load('role');
         return $user;
     }
 

@@ -91,7 +91,7 @@ export default {
         },
         [GET_CURRENT_USER]({ commit }) {
             return axios.get('/api/user').then(response => {
-                commit(SET_USER, response.data || []);
+                commit(SET_USER, response.data || null);
             });
         },
         [LOAD_ROLES]({ commit }) {
@@ -114,7 +114,7 @@ export default {
                 }
             });
         },
-        [UPDATE_USER]({ commit, state }, payload) {
+        [UPDATE_USER]({ dispatch, commit, state }, payload) {
             return axios.put('/api/users/' + payload.id, payload).then(response => {
                 const user = response.data || null;
                 if (user) {
@@ -123,6 +123,9 @@ export default {
                         const updatedUsers = _.cloneDeep(state.users);
                         updatedUsers.splice(userIndex, 1, user);
                         commit(SET_USERS, updatedUsers);
+                    }
+                    if (user.id === state.user.id) {
+                        commit(SET_USER, user);
                     }
                 }
             });
