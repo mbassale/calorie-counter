@@ -29,7 +29,8 @@ class UsersController extends Controller
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'required|email',
-            'password' => 'required|confirmed'
+            'password' => 'required|confirmed',
+            'calories_per_day' => 'nullable|numeric|min:1'
         ]);
 
         // create user and return login token
@@ -51,7 +52,7 @@ class UsersController extends Controller
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'required',
-            'calories_per_day' => 'nullable|numeric|min:0'
+            'calories_per_day' => 'nullable|numeric|min:1'
         ]);
         $user->update($request->only(['first_name', 'last_name', 'email', 'calories_per_day']));
         if ($request->has('role_id') && $user->role_id != $request->role_id) {
