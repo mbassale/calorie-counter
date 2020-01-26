@@ -39,6 +39,9 @@
                                             <b-input type="password" class="form-control-user" placeholder="Password"
                                                      v-model="password" :state="$v.password.$error ? false : null"
                                                      :disabled="disabled"/>
+                                            <b-form-invalid-feedback :state="$v.password.minLength.$error ? false : null">
+                                                Password must have at least 6 characters.
+                                            </b-form-invalid-feedback>
                                         </b-form-group>
                                     </div>
                                     <div class="col-sm-6">
@@ -48,6 +51,9 @@
                                                      v-model="password_confirmation"
                                                      :state="$v.password_confirmation.$error ? false : null"
                                                      :disabled="disabled"/>
+                                            <b-form-invalid-feedback :state="$v.password_confirmation.sameAsPassword.$error ? false : null">
+                                                Passwords must be equal.
+                                            </b-form-invalid-feedback>
                                         </b-form-group>
                                     </div>
                                 </b-form-row>

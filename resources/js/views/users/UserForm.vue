@@ -35,6 +35,9 @@
                 <b-form-group label="Password" label-for="email" :state="$v.password.$error ? false : null">
                     <b-form-input id="email" type="password" v-model="password" placeholder="Password"
                                   :disabled="disabled" :state="$v.password.$error ? false : null"/>
+                    <b-form-invalid-feedback :state="$v.password.minLength.$error ? false : null">
+                        Password must have at least 6 characters.
+                    </b-form-invalid-feedback>
                 </b-form-group>
             </b-col>
             <b-col>
@@ -43,6 +46,9 @@
                     <b-form-input id="email" type="password" v-model="password_confirmation"
                                   :disabled="disabled" :state="$v.password_confirmation.$error ? false : null"
                                   placeholder="Repeat Password"/>
+                    <b-form-invalid-feedback :state="$v.password_confirmation.sameAsPassword.$error ? false : null">
+                        Passwords must be equal.
+                    </b-form-invalid-feedback>
                 </b-form-group>
             </b-col>
         </b-form-row>
