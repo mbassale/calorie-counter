@@ -11,6 +11,7 @@
                                 <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
                             </div>
                             <b-form class="user">
+                                <b-alert variant="danger" dismissible :show="error">{{ error }}</b-alert>
                                 <b-form-row>
                                     <div class="col-sm-6 mb-3 mb-sm-0">
                                         <b-form-group :state="$v.first_name.$error ? false : null">
@@ -80,13 +81,17 @@
     import _ from 'lodash';
     import axios from 'axios';
     import {required, minLength, email, sameAs} from 'vuelidate/lib/validators'
-    import {LOGIN} from "../../store/actions";
+    import { LOGIN } from '../../store/actions';
+    import ToastMixin from '../../mixins/ToastMixin';
+    import ValidationMixin from '../../mixins/ValidationMixin';
 
     export default {
         name: 'Register',
+        mixins: [ToastMixin, ValidationMixin],
         data() {
             return {
                 isProcessing: false,
+                error: null,
                 first_name: null,
                 last_name: null,
                 email: null,
@@ -138,6 +143,12 @@
                             .finally(() => this.isProcessing = false);
                     }
                 }).catch(error => {
+                    const validationError = this.getValidationErrors(error);
+                    if (validationError && validationError.email) {
+                        this.error = validationError.email;
+                    } else {
+                        this.showNetworkError(error);
+                    }
                     this.isProcessing = false;
                 });
             }

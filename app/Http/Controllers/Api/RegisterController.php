@@ -24,7 +24,11 @@ class RegisterController extends Controller
         $userEmail = strtolower($request->email);
         $user = User::where('email', $userEmail)->first();
         if ($user) {
-            return response('User already taken', 422);
+            return response()->json([
+                'errors' => [
+                    'email' => 'User already taken'
+                ]
+            ], 422);
         }
 
         // create user and return login token

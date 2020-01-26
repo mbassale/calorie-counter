@@ -1,6 +1,6 @@
 <template>
     <b-form @submit="onSubmit" @reset="onReset">
-        <b-alert variant="danger" :show="error">{{ error }}</b-alert>
+        <b-alert variant="danger" dismissible :show="error">{{ error }}</b-alert>
         <b-form-row>
             <b-col>
                 <b-form-group label="Role" label-for="role_id"
