@@ -181,15 +181,6 @@ class UsersTest extends TestCase
         $response = $this->put('/api/users/' . $randomUser->id, $updatedData);
         $response->assertStatus(200);
         $response->assertJson(array_merge(['id' => $randomUser->id], $updatedData));
-        // Manager cannot change a user role
-        $updatedData = [
-            'role_id' => Role::MANAGER,
-            'first_name' => 'test2',
-            'last_name' => 'test2',
-            'email' => 'test2@test.com'
-        ];
-        $response = $this->put('/api/users/' . $randomUser->id, $updatedData);
-        $response->assertStatus(403);
 
         // Normal User
         Passport::actingAs($this->normalUser);
@@ -228,9 +219,11 @@ class UsersTest extends TestCase
             'last_name' => $randomUser->last_name,
             'email' => $randomUser->email
         ]);
-        // undo deletion
-        $randomUser->refresh();
-        $randomUser->restore();
+        $this->assertDatabaseMissing('users', ['id' => $randomUser->id]);
+        // remove deleted user from collection
+        $this->normalUsers = $this->normalUsers->filter(function ($normalUser) use ($randomUser) {
+            return $normalUser->id != $randomUser->id;
+        });
 
         // Manager Permission
         Passport::actingAs($this->managerUser);
@@ -244,9 +237,10 @@ class UsersTest extends TestCase
             'last_name' => $randomUser->last_name,
             'email' => $randomUser->email
         ]);
-        // undo deletion
-        $randomUser->refresh();
-        $randomUser->restore();
+        // remove deleted user from collection
+        $this->normalUsers = $this->normalUsers->filter(function ($normalUser) use ($randomUser) {
+            return $normalUser->id != $randomUser->id;
+        });
 
         // Normal User, 403 Forbidden
         Passport::actingAs($this->normalUser);
