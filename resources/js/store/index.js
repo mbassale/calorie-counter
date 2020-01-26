@@ -85,6 +85,8 @@ export default {
         [LOGOUT]({ commit }) {
             commit(SET_TOKEN, null);
             commit(SET_USER, null);
+            commit(SET_USERS, []);
+            commit(SET_MEALS, []);
             return Promise.resolve();
         },
         [GET_CURRENT_USER]({ commit }) {
