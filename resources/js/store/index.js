@@ -155,41 +155,14 @@ export default {
                 commit(SET_MEALS, response.data || []);
             });
         },
-        [CREATE_MEAL]({ commit, state }, payload) {
-            return axios.post('/api/meals', payload).then(response => {
-                const meal = response.data || null;
-                if (meal) {
-                    const updatedMeals = _.cloneDeep(state.meals);
-                    updatedMeals.push(meal);
-                    commit(SET_MEALS, updatedMeals);
-                }
-            });
+        [CREATE_MEAL]({ dispatch }, payload) {
+            return axios.post('/api/meals', payload).then(() => dispatch(LOAD_MEALS));
         },
-        [UPDATE_MEAL]({ commit, state }, payload) {
-            return axios.put('/api/meals/' + payload.id, payload).then(response => {
-                const meal = response.data || null;
-                if (meal) {
-                    const mealIndex = state.meals.findIndex(m => m.id === meal.id);
-                    if (mealIndex >= 0) {
-                        const updatedMeals = _.cloneDeep(state.meals);
-                        updatedMeals.splice(mealIndex, 1, meal);
-                        commit(SET_MEALS, updatedMeals);
-                    }
-                }
-            });
+        [UPDATE_MEAL]({ dispatch }, payload) {
+            return axios.put('/api/meals/' + payload.id, payload).then(() => dispatch(LOAD_MEALS));
         },
-        [DELETE_MEAL]({ commit, state }, payload) {
-            return axios.delete('/api/meals/' + payload.id).then(response => {
-                const meal = response.data || null;
-                if (meal) {
-                    const mealIndex = state.meals.findIndex(m => m.id === meal.id);
-                    if (mealIndex >= 0) {
-                        const updatedMeals = _.cloneDeep(state.meals);
-                        updatedMeals.splice(mealIndex, 1);
-                        commit(SET_MEALS, updatedMeals);
-                    }
-                }
-            });
+        [DELETE_MEAL]({ dispatch }, payload) {
+            return axios.delete('/api/meals/' + payload.id).then(() => dispatch(LOAD_MEALS));
         }
     }
 };
