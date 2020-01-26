@@ -1,3 +1,4 @@
+import _ from 'lodash';
 
 export default {
     methods: {
@@ -18,7 +19,8 @@ export default {
             this.showToast('danger', 'Error', message);
         },
         showNetworkError(error) {
-            this.showToast('danger', 'Network Error', error.body || 'Please try again later.');
+            const message = _.isObject(error.response.data) ? (error.response.data.message || null) : error.response.data;
+            this.showToast('danger', 'Network Error', message || 'Please try again later.');
         }
     }
 }

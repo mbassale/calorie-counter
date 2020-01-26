@@ -1,5 +1,6 @@
 <template>
     <b-form @submit="onSubmit" @reset="onReset">
+        <b-alert variant="danger" :show="error">{{ error }}</b-alert>
         <b-form-row>
             <b-col>
                 <b-form-group label="Role" label-for="role_id"
@@ -77,12 +78,12 @@
     import {mapState, mapGetters} from 'vuex';
     import {CREATE_USER, LOAD_ROLES, UPDATE_USER} from '../../store/actions';
     import ToastMixin from '../../mixins/ToastMixin';
+    import ValidationMixin from '../../mixins/ValidationMixin';
     import {minLength, required, email, sameAs, integer, minValue} from 'vuelidate/lib/validators';
-    import {ROLE_ADMIN} from "../../store/roles";
 
     export default {
         name: 'UserForm',
-        mixins: [ToastMixin],
+        mixins: [ToastMixin, ValidationMixin],
         props: {
             user: {
                 required: true,
@@ -93,6 +94,7 @@
             return {
                 isLoading: false,
                 isProcessing: false,
+                error: null,
                 id: null,
                 role_id: null,
                 first_name: null,
@@ -199,14 +201,26 @@
                     }
                     this.$store.dispatch(UPDATE_USER, userData)
                         .then(() => this.showSuccess('User Updated'))
-                        .catch(error => this.showNetworkError(error))
-                        .finally(() => this.isProcessing = false);
+                        .catch(error => {
+                            const errorData = this.getValidationErrors(error);
+                            if (errorData && errorData.email) {
+                                this.error = errorData.email;
+                                return;
+                            }
+                            this.showNetworkError(error);
+                        }).finally(() => this.isProcessing = false);
                 } else {
                     _.assign(userData, _.pick(this, ['password', 'password_confirmation']));
                     this.$store.dispatch(CREATE_USER, userData)
                         .then(() => this.showSuccess('User Created'))
-                        .catch(error => this.showNetworkError(error))
-                        .finally(() => this.isProcessing = false);
+                        .catch(error => {
+                            const errorData = this.getValidationErrors(error);
+                            if (errorData && errorData.email) {
+                                this.error = errorData.email;
+                                return;
+                            }
+                            this.showNetworkError(error);
+                        }).finally(() => this.isProcessing = false);
                 }
             },
             onReset(evt) {

@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UsersController extends Controller
 {
@@ -28,7 +29,7 @@ class UsersController extends Controller
             'role_id' => 'required|exists:roles,id',
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|confirmed',
             'calories_per_day' => 'nullable|numeric|min:1'
         ]);
@@ -52,7 +53,10 @@ class UsersController extends Controller
             'role_id' => 'nullable|exists:roles,id',
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'required',
+            'email' => [
+                'required',
+                Rule::unique('users')->ignore($user->id),
+            ],
             'calories_per_day' => 'nullable|numeric|min:1'
         ]);
         $user->update($request->only(['first_name', 'last_name', 'email', 'calories_per_day']));
