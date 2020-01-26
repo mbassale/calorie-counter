@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Meal;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -17,13 +18,15 @@ class MealsController extends Controller
             $query->where('user_id', $user->id);
         }
         if ($request->has('startDate')) {
-            $query->where('date', '>=', $request->startDate);
+            $startDate = Carbon::parse($request->startDate)->startOfDay();
+            $query->where('date', '>=', $startDate);
         }
         if ($request->has('startTime')) {
             $query->whereRaw("TIME_TO_SEC(TIME(`date`)) >= TIME_TO_SEC('{$request->startTime}:00')");
         }
         if ($request->has('endDate')) {
-            $query->where('date', '<=', $request->endDate);
+            $endDate = Carbon::parse($request->endDate)->endOfDay();
+            $query->where('date', '<=', $endDate);
         }
         if ($request->has('endTime')) {
             $query->whereRaw("TIME_TO_SEC(TIME(`date`)) <=  TIME_TO_SEC('{$request->endTime}:00')");
