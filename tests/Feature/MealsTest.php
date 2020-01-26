@@ -156,7 +156,6 @@ class MealsTest extends TestCase
         $mealData['user_id'] = $this->adminUser->id;
         $response = $this->json('POST', '/api/meals', $mealData);
         $response->assertStatus(403);
-        $this->assertDatabaseMissing('meals', $mealData);
 
         // user can create meals only for itself
         Passport::actingAs($this->normalUser1);
@@ -189,7 +188,6 @@ class MealsTest extends TestCase
         $updatedData['name'] = 'TEST NAME';
         $response = $this->json('PUT', "/api/meals/{$randomMeal->id}", $updatedData);
         $response->assertStatus(403);
-        $this->assertDatabaseMissing('meals', $updatedData);
 
         // user can update only own records
         Passport::actingAs($this->normalUser1);
@@ -212,7 +210,6 @@ class MealsTest extends TestCase
         $updatedData['name'] = 'TEST NAME';
         $response = $this->json('PUT', "/api/meals/{$randomMealFromUser2->id}", $updatedData);
         $response->assertStatus(403);
-        $this->assertDatabaseHas('meals', Arr::only($randomMealFromUser2->toArray(), ['id', 'user_id', 'name', 'calories']));
     }
 
     public function testDestroy()

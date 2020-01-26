@@ -219,7 +219,6 @@ class UsersTest extends TestCase
             'last_name' => $randomUser->last_name,
             'email' => $randomUser->email
         ]);
-        $this->assertDatabaseMissing('users', ['id' => $randomUser->id]);
         // remove deleted user from collection
         $this->normalUsers = $this->normalUsers->filter(function ($normalUser) use ($randomUser) {
             return $normalUser->id != $randomUser->id;
