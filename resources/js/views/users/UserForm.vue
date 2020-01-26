@@ -39,8 +39,20 @@
             <b-col>
                 <b-form-group label="Repeat Password" label-for="email"
                               :state="$v.password_confirmation.$error ? false : null">
-                    <b-form-input id="email" type="password" v-model="password_confirmation" placeholder="Repeat Password"
-                                  :disabled="disabled" :state="$v.password_confirmation.$error ? false : null"/>
+                    <b-form-input id="email" type="password" v-model="password_confirmation"
+                                  :disabled="disabled" :state="$v.password_confirmation.$error ? false : null"
+                                  placeholder="Repeat Password"/>
+                </b-form-group>
+            </b-col>
+        </b-form-row>
+
+        <b-form-row>
+            <b-col cols="4">
+                <b-form-group label="Calories Per Day" laber-for="calories_per_day"
+                              :state="$v.calories_per_day.$error ? false : null">
+                    <b-form-input id="calories_per_day" type="number" v-model="calories_per_day"
+                                  placeholder="Calories Per Day" min="0" step="1"
+                                  :disabled="disabled" :state="$v.calories_per_day.$error ? false : null"/>
                 </b-form-group>
             </b-col>
         </b-form-row>
@@ -65,7 +77,7 @@
     import {mapState, mapGetters} from 'vuex';
     import {CREATE_USER, LOAD_ROLES, UPDATE_USER} from '../../store/actions';
     import ToastMixin from '../../mixins/ToastMixin';
-    import {minLength, required, email, sameAs} from 'vuelidate/lib/validators';
+    import {minLength, required, email, sameAs, integer, minValue} from 'vuelidate/lib/validators';
 
     export default {
         name: 'UserForm',
@@ -86,7 +98,8 @@
                 last_name: null,
                 email: null,
                 password: null,
-                password_confirmation: null
+                password_confirmation: null,
+                calories_per_day: null
             };
         },
         computed: {
@@ -126,6 +139,10 @@
                 },
                 password_confirmation: {
                     sameAsPassword: sameAs('password')
+                },
+                calories_per_day: {
+                    integer,
+                    minValue: minValue(0)
                 }
             };
             if (!this.user.id) {
@@ -154,12 +171,14 @@
                 this.email = null;
                 this.password = null;
                 this.password_confirmation = null;
+                this.calories_per_day = null;
                 if (this.user.id) {
                     this.id = this.user.id || null;
                     this.role_id = this.user.role_id || null;
                     this.first_name = this.user.first_name || null;
                     this.last_name = this.user.last_name || null;
                     this.email = this.user.email || null;
+                    this.calories_per_day = this.user.calories_per_day || null;
                 }
                 if (_.isEmpty(this.roles)) {
                     this.isLoading = true;
@@ -173,7 +192,7 @@
                     return;
                 }
                 this.isProcessing = true;
-                const userData = _.pick(this, ['id', 'role_id', 'first_name', 'last_name', 'email']);
+                const userData = _.pick(this, ['id', 'role_id', 'first_name', 'last_name', 'email', 'calories_per_day']);
                 if (this.user.id) {
                     if (this.password) {
                         _.assign(userData, _.pick(this, ['password', 'password_confirmation']));
