@@ -2,14 +2,25 @@
     <b-container>
         <div class="row">
             <div class="col-auto mr-auto">
-                <h1><fa-icon icon="utensils" /> Meals</h1>
+                <h1>
+                    <fa-icon icon="utensils" /> Meals &mdash;
+                    <span class="calories-per-day" :class="{ 'text-warning': !maxCaloriesPerDay }" @click="handleSetCaloriesPerDay">
+                        Calories Per Day: {{ maxCaloriesPerDay || 'Not Set' }}
+                    </span>
+                </h1>
             </div>
             <div class="col-auto">
-                <b-button type="button" variant="primary" @click="isFiltering = true" :disabled="disabled || isFiltering">
+                <b-button type="button" variant="primary" @click="isFiltering = true"
+                          :disabled="disabled || isFiltering || isSettingCaloriesPerDay">
                     <fa-icon icon="search" /> Search
                 </b-button>
-                <b-button type="button" variant="primary" @click="handleCreate" :disabled="disabled || isFiltering">
+                <b-button type="button" variant="primary" @click="handleCreate"
+                          :disabled="disabled || isFiltering || isSettingCaloriesPerDay">
                     <fa-icon icon="plus" /> New Meal
+                </b-button>
+                <b-button type="button" variant="primary" title="Set Calories Per Day" @click="handleSetCaloriesPerDay"
+                          :disabled="disabled || isFiltering || isSettingCaloriesPerDay">
+                    <fa-icon icon="calculator" />
                 </b-button>
                 <b-button type="button" variant="secondary" title="Refresh" @click="loadData" :disabled="disabled">
                     <fa-icon v-if="isLoading" icon="spinner" spin />
@@ -19,6 +30,9 @@
         </div>
         <meal-search v-if="isFiltering" :disabled="disabled"
                      @search="handleSearch" @reset="handleSearchReset" @cancel="isFiltering = false" />
+        <calories-per-day-form v-if="isSettingCaloriesPerDay"
+                               @updated="handleCaloriesPerDayUpdated"
+                               @cancel="isSettingCaloriesPerDay = false" />
         <b-table striped hover show-empty responsive="md" :items="orderedMeals" :fields="fields" :busy="isLoading">
             <template v-slot:cell(actions)="data">
                 <b-button variant="primary" size="sm" title="Edit" @click="data.toggleDetails"
@@ -53,6 +67,7 @@
     import {DELETE_MEAL, LOAD_MEALS, SEARCH_MEALS} from '../../store/actions';
     import MealForm from './MealForm.vue';
     import MealSearch from './MealSearch.vue';
+    import CaloriesPerDayForm from './CaloriesPerDayForm.vue';
     import ToastMixin from '../../mixins/ToastMixin';
     import ConfirmModalMixin from '../../mixins/ConfirmModalMixin';
 
@@ -60,7 +75,8 @@
         name: 'Meals',
         components: {
             MealForm,
-            MealSearch
+            MealSearch,
+            CaloriesPerDayForm
         },
         mixins: [ToastMixin, ConfirmModalMixin],
         data() {
@@ -68,12 +84,16 @@
                 isLoading: false,
                 isCreating: false,
                 isDeletingId: null,
-                isFiltering: false
+                isFiltering: false,
+                isSettingCaloriesPerDay: false,
             };
         },
         computed: {
             disabled() {
                 return this.isLoading || this.isCreating || this.isDeletingId;
+            },
+            maxCaloriesPerDay() {
+                return this.user.calories_per_day;
             },
             fields() {
                 const tableFields = [
@@ -147,7 +167,7 @@
                 }
                 return meals;
             },
-            ...mapState(['meals']),
+            ...mapState(['meals', 'user']),
             ...mapGetters(['isAdmin'])
         },
         watch: {
@@ -183,6 +203,13 @@
             handleCreate() {
                 this.isCreating = true;
             },
+            handleSetCaloriesPerDay() {
+                this.isSettingCaloriesPerDay = true;
+            },
+            handleCaloriesPerDayUpdated() {
+                this.showSuccess('Calories Per Day Updated');
+                this.isSettingCaloriesPerDay = false;
+            },
             handleDelete(meal) {
                 return this.showConfirmDeletionModal('Are you sure to delete this meal?')
                     .then(value => {
@@ -206,5 +233,7 @@
 </script>
 
 <style scoped>
-
+    .calories-per-day {
+        cursor: pointer;
+    }
 </style>

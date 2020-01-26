@@ -50,9 +50,10 @@ class UsersController extends Controller
             'role_id' => 'nullable|exists:roles,id',
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'required'
+            'email' => 'required',
+            'calories_per_day' => 'nullable|numeric|min:0'
         ]);
-        $user->update($request->only(['first_name', 'last_name', 'email']));
+        $user->update($request->only(['first_name', 'last_name', 'email', 'calories_per_day']));
         if ($request->has('role_id') && $user->role_id != $request->role_id) {
             $this->authorize('updateRole', User::class);
             $user->role_id = $request->input('role_id');

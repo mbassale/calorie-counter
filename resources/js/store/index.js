@@ -13,6 +13,7 @@ import {
 import {
     LOGIN,
     LOGOUT,
+    GET_CURRENT_USER,
     LOAD_ROLES,
     LOAD_USERS,
     CREATE_USER,
@@ -76,17 +77,20 @@ export default {
         }
     },
     actions: {
-        [LOGIN]({ commit, state }, { token }) {
+        [LOGIN]({ dispatch, commit, state }, { token }) {
             commit(SET_TOKEN, token);
             window.axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            return axios.get('/api/user').then(response => {
-                commit(SET_USER, response.data || []);
-            });
+            return dispatch(GET_CURRENT_USER);
         },
         [LOGOUT]({ commit }) {
             commit(SET_TOKEN, null);
             commit(SET_USER, null);
             return Promise.resolve();
+        },
+        [GET_CURRENT_USER]({ commit }) {
+            return axios.get('/api/user').then(response => {
+                commit(SET_USER, response.data || []);
+            });
         },
         [LOAD_ROLES]({ commit }) {
             return axios.get('/api/roles').then(response => {
