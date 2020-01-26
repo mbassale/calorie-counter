@@ -142,7 +142,6 @@
                                 .finally(() => this.isDeletingId = null);
                         }
                     });
-
             },
             handleFormCancel(row) {
                 row.toggleDetails();

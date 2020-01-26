@@ -104,6 +104,6 @@ class UserPolicy
 
     public function updateRole(User $user)
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isManager();
     }
 }

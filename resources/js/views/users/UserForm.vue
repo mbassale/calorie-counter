@@ -2,7 +2,7 @@
     <b-form @submit="onSubmit" @reset="onReset">
         <b-form-row>
             <b-col>
-                <b-form-group v-if="isAdmin" label="Role" label-for="role_id"
+                <b-form-group label="Role" label-for="role_id"
                               :state="$v.role_id.$error ? false : null">
                     <b-form-select id="role_id" v-model="role_id" :options="selectRoles" :disabled="disabled"
                                    :state="$v.role_id.$error ? false : null"/>
@@ -78,6 +78,7 @@
     import {CREATE_USER, LOAD_ROLES, UPDATE_USER} from '../../store/actions';
     import ToastMixin from '../../mixins/ToastMixin';
     import {minLength, required, email, sameAs, integer, minValue} from 'vuelidate/lib/validators';
+    import {ROLE_ADMIN} from "../../store/roles";
 
     export default {
         name: 'UserForm',
@@ -114,8 +115,7 @@
                     };
                 });
             },
-            ...mapState(['roles']),
-            ...mapGetters(['isAdmin'])
+            ...mapState(['roles'])
         },
         validations() {
             const schema = {
