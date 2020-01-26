@@ -3,9 +3,10 @@
         <div class="row">
             <div class="col-auto mr-auto">
                 <h1>
-                    <fa-icon icon="utensils" /> Meals &mdash;
-                    <span class="calories-per-day" :class="{ 'text-warning': !maxCaloriesPerDay }" @click="handleSetCaloriesPerDay">
-                        Calories Per Day: {{ maxCaloriesPerDay || 'Not Set' }}
+                    <fa-icon icon="utensils" /> Meals
+                    <span v-if="isUser" class="calories-per-day" :class="{ 'text-warning': !maxCaloriesPerDay }"
+                          @click="handleSetCaloriesPerDay">
+                        &mdash; Calories Per Day: {{ maxCaloriesPerDay || 'Not Set' }}
                     </span>
                 </h1>
             </div>
@@ -168,7 +169,7 @@
                 return meals;
             },
             ...mapState(['meals', 'user']),
-            ...mapGetters(['isAdmin'])
+            ...mapGetters(['isAdmin', 'isUser'])
         },
         watch: {
             meals() {
