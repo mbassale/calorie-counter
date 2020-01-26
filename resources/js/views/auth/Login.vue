@@ -28,7 +28,7 @@
                                                    @keydown.enter="handleLogin">
                                         </div>
                                         <button type="button" class="btn btn-primary btn-user btn-block"
-                                                @click="handleLogin" :disabled="disabled">
+                                                @click="handleLogin" :disabled="disabled || invalid">
                                             <fa-icon v-if="isProcessing" icon="spinner" spin /> Login
                                         </button>
                                     </form>
@@ -56,6 +56,7 @@
 </template>
 
 <script>
+    import _ from 'lodash';
     import axios from 'axios';
     import { LOGIN } from '../../store/actions';
 
@@ -74,10 +75,14 @@
         computed: {
             disabled() {
                 return this.isProcessing;
+            },
+            invalid() {
+                return _.isEmpty(this.email) || _.isEmpty(this.password);
             }
         },
         methods: {
             handleLogin() {
+                if (this.invalid) return;
                 this.error = null;
                 this.isProcessing = true;
                 axios.post('/api/login', {
@@ -91,19 +96,7 @@
                             .finally(() => this.isProcessing = false);
                     }
                 }).catch(error => {
-                    if (error.response) {
-                        let data = error.response.data;
-                        if (_.isObject(data) && _.isObject(data.errors)) {
-                            if (data.errors.password) {
-                                this.error = 'Invalid password';
-                            }
-                            if (data.errors.email) {
-                                this.error = 'Invalid email';
-                            }
-                        } else if (_.isString(data)) {
-                            this.error = data || null;
-                        }
-                    }
+                    this.error = 'Invalid credentials';
                     this.isProcessing = false;
                 });
             }
