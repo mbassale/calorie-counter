@@ -154,6 +154,11 @@
                 let meals = _.orderBy(this.meals.map(meal => {
                     meal = _.cloneDeep(meal);
                     meal._showDetails = false;
+                    if (meal.is_getting_fit === 1) {
+                        meal._rowVariant = 'success';
+                    } else if (meal.is_getting_fit === 0) {
+                        meal._rowVariant = 'danger';
+                    }
                     return meal;
                 }), ['date'], ['desc']);
                 if (this.isCreating) {
