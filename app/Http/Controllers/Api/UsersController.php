@@ -40,6 +40,7 @@ class UsersController extends Controller
             'last_name' => $request->last_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'calories_per_day' => $request->calories_per_day
         ]);
         return $user->load('role');
     }
