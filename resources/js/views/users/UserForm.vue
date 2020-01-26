@@ -142,7 +142,7 @@
                 },
                 calories_per_day: {
                     integer,
-                    minValue: minValue(0)
+                    minValue: minValue(1)
                 }
             };
             if (!this.user.id) {
